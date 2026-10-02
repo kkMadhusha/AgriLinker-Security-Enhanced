@@ -23,6 +23,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.agrilinker.backend.security.JwtAuthenticationFilter;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableWebSecurity
@@ -44,8 +45,18 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Public routes
                         .requestMatchers("/api/auth/**", "/error").permitAll()
-                        .requestMatchers("/api/chat/**").permitAll() // ✅ මෙන්න මේක ඇඩ් කරා
-                        .requestMatchers("/api/orders/**").permitAll()
+                        .requestMatchers("/api/chat/**").permitAll() 
+                        
+
+                           // Order routes
+.requestMatchers(HttpMethod.POST, "/api/orders").hasRole("BUYER")
+.requestMatchers(HttpMethod.PUT, "/api/orders/**").hasAnyRole("FARMER", "ADMIN")
+.requestMatchers(HttpMethod.DELETE, "/api/orders/**").hasRole("ADMIN")
+.requestMatchers(HttpMethod.GET, "/api/orders/farmer/**").hasRole("FARMER")
+.requestMatchers(HttpMethod.GET, "/api/orders/user/**").hasRole("BUYER")
+.requestMatchers(HttpMethod.GET, "/api/orders/**").authenticated()
+//.requestMatchers("/api/orders/**").permitAll()
+
                         .requestMatchers("/api/products/**").permitAll()
                         .requestMatchers("/api/fertilizers/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
@@ -57,8 +68,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/inquiries/**").permitAll()
                         .requestMatchers("/api/users/by-email").permitAll()
                         .requestMatchers("/api/mcq/**").permitAll()
-                        .requestMatchers("/api/orders/farmer/monthly-sales/**").permitAll()
-                        .requestMatchers("/api/orders/farmer/**").permitAll()
+                        //.requestMatchers("/api/orders/farmer/monthly-sales/**").permitAll()
+                        //.requestMatchers("/api/orders/farmer/**").permitAll()
 
 
                         // Admin routes
@@ -70,7 +81,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/fertilizersupplier/**").hasRole("FERTILIZERSUPPLIER")
 
                         // ✅ Crop Advisor 
-.requestMatchers("/api/advisor/**").permitAll()
+                        .requestMatchers("/api/advisor/**").permitAll()
 
                         // All other requests need authentication
                         .anyRequest().authenticated())
