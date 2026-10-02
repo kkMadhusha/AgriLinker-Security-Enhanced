@@ -160,35 +160,26 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order updateOrder(String id, Order order) {
+public Order updateOrder(String id, Order order) {
 
-        Order existingOrder = getOrderById(id);
+    Order existingOrder = getOrderById(id);
 
-        if (existingOrder != null) {
-            // new
-            if ("ACCEPTED".equalsIgnoreCase(order.getStatus()) &&
-                    !"ACCEPTED".equalsIgnoreCase(existingOrder.getStatus())) {
-
-                for (OrderItem item : existingOrder.getItems()) {
-
-                    productService.reduceProductQuantity(
-                            item.getProductId(),
-                            item.getQuantity());
-                }
-            }
-            existingOrder.setCustomer(order.getCustomer());
-            existingOrder.setItems(order.getItems());
-            existingOrder.setTotalAmount(order.getTotalAmount());
-            existingOrder.setPaymentMethod(order.getPaymentMethod());
-            existingOrder.setOrderDate(order.getOrderDate());
-            // new
-            existingOrder.setStatus(order.getStatus());
-            existingOrder.setPaymentStatus(order.getPaymentStatus());
-            return orderRepository.save(existingOrder);
-        }
-
+    if (existingOrder == null) {
         return null;
     }
+
+    // Only allow status/payment status updates
+    if (order.getStatus() != null) {
+        existingOrder.setStatus(order.getStatus());
+    }
+
+    if (order.getPaymentStatus() != null) {
+        existingOrder.setPaymentStatus(order.getPaymentStatus());
+    }
+
+    // Keep original customer, items, amount, payment method and date
+    return orderRepository.save(existingOrder);
+}
 
     @Override
     public void deleteOrder(String id) {
