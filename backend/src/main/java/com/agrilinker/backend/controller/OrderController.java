@@ -23,6 +23,7 @@ import org.springframework.security.core.AuthenticationException;
 import java.util.Map;
 
 import java.util.stream.Collectors;
+import org.springframework.security.core.Authentication;
 
 
 @RestController
@@ -51,17 +52,65 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable String id) {
-        Order order = orderService.getOrderById(id);
-        return order != null ? ResponseEntity.ok(order) : ResponseEntity.notFound().build();
+     public ResponseEntity<Order> getOrderById(
+        @PathVariable String id,
+        Principal principal) {
+
+    Order order = orderService.getOrderById(id);
+
+    if (order == null) {
+        return ResponseEntity.notFound().build();
     }
+
+    String authenticatedEmail = principal.getName();
+
+    // Only the order owner can view the order
+    if (order.getCustomer() == null ||
+            order.getCustomer().getEmail() == null ||
+            !authenticatedEmail.equalsIgnoreCase(order.getCustomer().getEmail())) {
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    return ResponseEntity.ok(order);
+}
 
     @PutMapping("/{id}")
-    public ResponseEntity<Order> updateOrder(@PathVariable String id, @Valid @RequestBody Order order) {
-        Order updatedOrder = orderService.updateOrder(id, order);
-        return updatedOrder != null ? ResponseEntity.ok(updatedOrder) : ResponseEntity.notFound().build();
+public ResponseEntity<Order> updateOrder(
+        @PathVariable String id,
+        @Valid @RequestBody Order order,
+        Authentication authentication) {
+
+    Order existingOrder = orderService.getOrderById(id);
+
+    if (existingOrder == null) {
+        return ResponseEntity.notFound().build();
     }
 
+    String authenticatedEmail = authentication.getName();
+
+    boolean isAdmin = authentication.getAuthorities().stream()
+            .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+
+    boolean isFarmer = authentication.getAuthorities().stream()
+            .anyMatch(authority -> authority.getAuthority().equals("ROLE_FARMER"));
+
+    boolean ownsOrder = existingOrder.getItems() != null &&
+            existingOrder.getItems().stream()
+                    .anyMatch(item ->
+                            authenticatedEmail.equalsIgnoreCase(item.getfarmerEmail()));
+
+    // Only the relevant farmer or an admin can update the order
+    if (!isAdmin && (!isFarmer || !ownsOrder)) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    Order updatedOrder = orderService.updateOrder(id, order);
+
+    return updatedOrder != null
+            ? ResponseEntity.ok(updatedOrder)
+            : ResponseEntity.notFound().build();
+}
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrder(@PathVariable String id) {
         orderService.deleteOrder(id);
@@ -83,9 +132,9 @@ public class OrderController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdf);
     }
-
+    //***change */
     @GetMapping("/user/{email}")
-public ResponseEntity<List<Order>> getOrdersByUserEmail(
+    public ResponseEntity<List<Order>> getOrdersByUserEmail(
         @PathVariable String email,
         Principal principal) {
 
@@ -99,7 +148,7 @@ public ResponseEntity<List<Order>> getOrdersByUserEmail(
 
     List<Order> orders = orderService.getOrdersByUserEmail(email);
     return ResponseEntity.ok(orders);
-}
+    }
 
     @GetMapping("/farmer")
 public ResponseEntity<List<Order>> getFarmerOrders(Principal principal) {
@@ -111,11 +160,21 @@ public ResponseEntity<List<Order>> getFarmerOrders(Principal principal) {
     return ResponseEntity.ok(orders);
 }
 
+//changed
     @GetMapping("/farmer/{email}")
-    public ResponseEntity<List<Order>> getFarmerOrdersByEmail(@PathVariable String email) {
+    public ResponseEntity<List<Order>> getFarmerOrdersByEmail(
+        @PathVariable String email,
+        Principal principal) {
+
+    String authenticatedEmail = principal.getName();//principal.getName() return karanne:farmerA@gmail.com
+
+    if (!authenticatedEmail.equalsIgnoreCase(email)) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
     List<Order> orders = orderService.getOrdersByFarmerEmail(email);
     return ResponseEntity.ok(orders);
-}
+    }
 
      //new
      @GetMapping("/sales-history/{email}")
