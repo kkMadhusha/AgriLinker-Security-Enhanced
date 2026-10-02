@@ -85,10 +85,21 @@ public class OrderController {
     }
 
     @GetMapping("/user/{email}")
-    public ResponseEntity<List<Order>> getOrdersByUserEmail(@PathVariable String email) {
-        List<Order> orders = orderService.getOrdersByUserEmail(email);
-        return ResponseEntity.ok(orders);
+public ResponseEntity<List<Order>> getOrdersByUserEmail(
+        @PathVariable String email,
+        Principal principal) {
+
+    // Get the email of the currently authenticated user
+    String authenticatedEmail = principal.getName();
+
+    // Prevent users from accessing another user's orders
+    if (!authenticatedEmail.equalsIgnoreCase(email)) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
+
+    List<Order> orders = orderService.getOrdersByUserEmail(email);
+    return ResponseEntity.ok(orders);
+}
 
     @GetMapping("/farmer")
 public ResponseEntity<List<Order>> getFarmerOrders(Principal principal) {
