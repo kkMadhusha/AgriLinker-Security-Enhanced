@@ -49,13 +49,13 @@ public class SecurityConfig {
                         
 
                            // Order routes
-.requestMatchers(HttpMethod.POST, "/api/orders").hasRole("BUYER")
-.requestMatchers(HttpMethod.PUT, "/api/orders/**").hasAnyRole("FARMER", "ADMIN")
-.requestMatchers(HttpMethod.DELETE, "/api/orders/**").hasRole("ADMIN")
-.requestMatchers(HttpMethod.GET, "/api/orders/farmer/**").hasRole("FARMER")
-.requestMatchers(HttpMethod.GET, "/api/orders/user/**").hasRole("BUYER")
-.requestMatchers(HttpMethod.GET, "/api/orders/**").authenticated()
-//.requestMatchers("/api/orders/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/orders").hasRole("BUYER")
+                        .requestMatchers(HttpMethod.PUT, "/api/orders/**").hasAnyRole("FARMER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/orders/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/orders/farmer/**").hasRole("FARMER")
+                        .requestMatchers(HttpMethod.GET, "/api/orders/user/**").hasRole("BUYER")
+                        .requestMatchers(HttpMethod.GET, "/api/orders/**").authenticated()
+                        //.requestMatchers("/api/orders/**").permitAll() delete public asess
 
                         .requestMatchers("/api/products/**").permitAll()
                         .requestMatchers("/api/fertilizers/**").permitAll()
