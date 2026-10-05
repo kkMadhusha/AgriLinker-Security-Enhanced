@@ -48,7 +48,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/chat/**").permitAll() 
                         
 
-                           // Order routes
+                        // Order routes
                         .requestMatchers(HttpMethod.POST, "/api/orders").hasRole("BUYER")
                         .requestMatchers(HttpMethod.PUT, "/api/orders/**").hasAnyRole("FARMER", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/orders/**").hasRole("ADMIN")
@@ -63,15 +63,14 @@ public class SecurityConfig {
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/cart/**").permitAll()
                         .requestMatchers("/api/reviews/**").permitAll()
-                        .requestMatchers("/api/notifications/**").permitAll()
+                        .requestMatchers("/api/notifications/**").authenticated()
+                        
 
                         // inquiry
                         .requestMatchers("/api/inquiries/**").permitAll()
                         .requestMatchers("/api/users/by-email").permitAll()
                         .requestMatchers("/api/mcq/**").permitAll()
-                        //.requestMatchers("/api/orders/farmer/monthly-sales/**").permitAll()
-                        //.requestMatchers("/api/orders/farmer/**").permitAll()
-
+                        
 
                         // Admin routes
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
@@ -97,7 +96,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOriginPatterns(List.of("*"));
+        //change
+        config.setAllowedOrigins(List.of("http://localhost:3000"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
 
