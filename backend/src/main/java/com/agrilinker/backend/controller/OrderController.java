@@ -39,11 +39,28 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
+
+//change
     @PostMapping
-    public ResponseEntity<Order> createOrder(@Valid @RequestBody Order order) {
-        Order savedOrder = orderService.createOrder(order);
-        return new ResponseEntity<>(savedOrder, HttpStatus.CREATED);
+    public ResponseEntity<Order> createOrder( 
+        @Valid @RequestBody Order order,
+        Principal principal) {
+
+    String authenticatedEmail = principal.getName();
+
+    if (order.getCustomer() == null ||
+            order.getCustomer().getEmail() == null ||
+            !authenticatedEmail.equalsIgnoreCase(order.getCustomer().getEmail())) {
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
+
+    Order savedOrder = orderService.createOrder(order);
+
+    return new ResponseEntity<>(savedOrder, HttpStatus.CREATED);
+   }
+
+   
 
     @GetMapping
     public ResponseEntity<List<Order>> getAllOrders() {
@@ -76,7 +93,7 @@ public class OrderController {
 }
 
     @PutMapping("/{id}")
-public ResponseEntity<Order> updateOrder(
+    public ResponseEntity<Order> updateOrder(
         @PathVariable String id,
         @Valid @RequestBody Order order,
         Authentication authentication) {
