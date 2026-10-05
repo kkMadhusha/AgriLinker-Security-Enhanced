@@ -117,22 +117,38 @@ public ResponseEntity<Order> updateOrder(
         return ResponseEntity.noContent().build();
     }
 
+
+//chnage
     @GetMapping("/{orderNumber}/invoice")
-    public ResponseEntity<byte[]> downloadInvoice(@PathVariable String orderNumber) {
+public ResponseEntity<byte[]> downloadInvoice(
+        @PathVariable String orderNumber,
+        Principal principal) {
 
-        Order order = orderRepository.findByOrderNumber(orderNumber)
-                .orElseThrow(() -> new RuntimeException("Order not found: " + orderNumber));
+    Order order = orderRepository.findByOrderNumber(orderNumber)
+            .orElseThrow(() -> new RuntimeException("Order not found: " + orderNumber));
 
-        byte[] pdf = invoiceService.generateInvoicePdf(order);
+    String authenticatedEmail = principal.getName();
 
-        String filename = "invoice-" + orderNumber + ".pdf";
+    if (order.getCustomer() == null ||
+            order.getCustomer().getEmail() == null ||
+            !authenticatedEmail.equalsIgnoreCase(order.getCustomer().getEmail())) {
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(pdf);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
-    //***change */
+
+    byte[] pdf = invoiceService.generateInvoicePdf(order);
+
+    String filename = "invoice-" + orderNumber + ".pdf";
+
+    return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION,
+                    "attachment; filename=\"" + filename + "\"")
+            .contentType(MediaType.APPLICATION_PDF)
+            .body(pdf);
+}
+
+
+ //change /
     @GetMapping("/user/{email}")
     public ResponseEntity<List<Order>> getOrdersByUserEmail(
         @PathVariable String email,
@@ -149,6 +165,8 @@ public ResponseEntity<Order> updateOrder(
     List<Order> orders = orderService.getOrdersByUserEmail(email);
     return ResponseEntity.ok(orders);
     }
+
+
 
     @GetMapping("/farmer")
 public ResponseEntity<List<Order>> getFarmerOrders(Principal principal) {
@@ -175,6 +193,8 @@ public ResponseEntity<List<Order>> getFarmerOrders(Principal principal) {
     List<Order> orders = orderService.getOrdersByFarmerEmail(email);
     return ResponseEntity.ok(orders);
     }
+
+
 
      //new
      @GetMapping("/sales-history/{email}")
