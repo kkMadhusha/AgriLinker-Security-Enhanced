@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+
+import api from "../../api/api";
+
 import { useNavigate } from "react-router-dom";
 
 const FarmerOrders = () => {
@@ -18,10 +20,8 @@ const FarmerOrders = () => {
     const fetchOrders = async () => {
       try {
         console.log("Fetching orders for:", farmerEmail);
-
-        const res = await axios.get(
-          `http://localhost:8081/api/orders/farmer/${farmerEmail}`,
-        );
+        //change
+        const res = await api.get(`/api/orders/farmer/${farmerEmail}`);
 
         console.log("Orders received:", res.data);
 
@@ -52,7 +52,8 @@ const FarmerOrders = () => {
 
   const updateOrderStatus = async (newStatus) => {
     try {
-      await axios.put(`http://localhost:8081/api/orders/${selectedOrder.id}`, {
+      //chnage
+      await api.put(`api/orders/${selectedOrder.id}`, {
         ...selectedOrder,
         status: newStatus,
       });
@@ -72,7 +73,8 @@ const FarmerOrders = () => {
 
   const updatePaymentStatus = async (newPaymentStatus) => {
     try {
-      await axios.put(`http://localhost:8081/api/orders/${selectedOrder.id}`, {
+      //change
+      await api.put(`/api/orders/${selectedOrder.id}`, {
         ...selectedOrder,
         paymentStatus: newPaymentStatus,
       });
