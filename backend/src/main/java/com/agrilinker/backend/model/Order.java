@@ -7,17 +7,25 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.Date;
 import java.util.List;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.PositiveOrZero;
+
 @Document(collection = "orders")
 public class Order {
 
     @Id
     private String id;
 
-    @Indexed(unique = true) // ✅ makes sure orderNumber can't duplicate
+    @Indexed(unique = true) //  makes sure orderNumber can't duplicate
     private String orderNumber;
 
+    @Valid
     private Customer customer;
+
+    @Valid
     private List<OrderItem> items;
+
+    @PositiveOrZero
     private double totalAmount;
     private String paymentMethod;
     private Date orderDate = new Date();
@@ -97,7 +105,7 @@ public class Order {
     //new
     public String getStatus() {
     return status;
-}
+    }
 
 public void setStatus(String status) {
     this.status = status;
