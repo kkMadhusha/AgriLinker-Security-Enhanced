@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+
+import api from "../../api/api";
 
 import { useNavigate } from "react-router-dom"; // Import this for navigation
 import {
@@ -83,34 +84,26 @@ const FarmerDashboard = () => {
       if (!email) return;
 
       try {
-        const res = await axios.get(
-          `http://localhost:8081/api/products/farmer/${email}`,
-        );
+        const res = await api.get(`api/products/farmer/${email}`);
         setProducts(res.data);
 
         // fetch stats
-        const statsRes = await axios.get(
-          `http://localhost:8081/api/orders/farmer-stats/${email}`,
-        );
+        const statsRes = await api.get(`api/orders/farmer-stats/${email}`);
         setStats(statsRes.data);
 
         // payment breakdown fetch
-        axios
-          .get(
-            `http://localhost:8081/api/orders/farmer/payment-breakdown/${email}`,
-          )
-          .then((res) => {
-            // Transform if res.data is object
-            const data = Object.entries(res.data).map(([key, value]) => ({
-              name: key,
-              value: value,
-            }));
-            setPaymentData(data);
-          });
+        api.get(`api/orders/farmer/payment-breakdown/${email}`).then((res) => {
+          // Transform if res.data is object
+          const data = Object.entries(res.data).map(([key, value]) => ({
+            name: key,
+            value: value,
+          }));
+          setPaymentData(data);
+        });
 
         // 4. Fetch Monthly Sales (Line Chart)
-        const salesRes = await axios.get(
-          `http://localhost:8081/api/orders/farmer/monthly-sales/${email}`,
+        const salesRes = await api.get(
+          `api/orders/farmer/monthly-sales/${email}`,
         );
         console.log("Monthly Sales received:", salesRes.data); // Console එකේ බලන්න data එනවද කියලා
         setMonthlySales(salesRes.data);
