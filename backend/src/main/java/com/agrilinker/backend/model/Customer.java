@@ -1,8 +1,13 @@
 package com.agrilinker.backend.model;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
 public class Customer {
 
+    @NotBlank
     private String name;
+
+    @NotBlank
     private String email;
     private String phone;
     private String address;
