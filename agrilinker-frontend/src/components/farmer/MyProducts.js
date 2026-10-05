@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "../../api/api";
 
 const MyProducts = () => {
   const [products, setProducts] = useState([]);
@@ -36,9 +37,7 @@ const MyProducts = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:8081/api/orders/farmer-stats/${farmerEmail}`,
-        );
+        const res = await api.get(`api/orders/farmer-stats/${farmerEmail}`);
 
         console.log("Stats response:", res.data); // debug
         setStats(res.data);
