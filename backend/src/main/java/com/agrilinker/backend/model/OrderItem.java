@@ -1,11 +1,18 @@
 package com.agrilinker.backend.model;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.PositiveOrZero;
+
 public class OrderItem {
 
     private String productId;
     private String fertilizerId;
     private String name;
+
+    @Min(1)
     private int quantity;
+
+    @PositiveOrZero
     private double price;
     private String farmerEmail;
 
