@@ -3,8 +3,8 @@ import api from "../api/api";
 import { AuthContext } from "../context/AuthContext";
 
 const OrderHistory = () => {
-  const { user } = useContext(AuthContext);     //  get logged-in user
-  const USER_ID = user?.email || null;          // email comes from user object
+  const { user } = useContext(AuthContext); //  get logged-in user
+  const USER_ID = user?.email || null; // email comes from user object
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,10 +16,10 @@ const OrderHistory = () => {
           setOrders([]);
           return;
         }
-
+        //change
         const res = await api.get(
-  `/api/orders?email=${encodeURIComponent(USER_ID)}`
-);
+          `/api/orders/user/${encodeURIComponent(USER_ID)}`,
+        );
 
         setOrders(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
@@ -33,15 +33,20 @@ const OrderHistory = () => {
     loadOrders();
   }, [USER_ID]);
 
-  if (loading) return <div className="text-center p-10">Loading your history...</div>;
+  if (loading)
+    return <div className="text-center p-10">Loading your history...</div>;
 
   return (
     <div className="max-w-5xl mx-auto p-6 bg-gray-50 min-h-screen">
-      <h1 className="text-3xl font-bold text-green-900 mb-8">My Purchase History</h1>
+      <h1 className="text-3xl font-bold text-green-900 mb-8">
+        My Purchase History
+      </h1>
 
       {orders.length === 0 ? (
         <div className="bg-white p-10 rounded-2xl shadow-sm text-center">
-          <p className="text-gray-500 text-lg">You haven't placed any orders yet.</p>
+          <p className="text-gray-500 text-lg">
+            You haven't placed any orders yet.
+          </p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -52,13 +57,21 @@ const OrderHistory = () => {
             >
               <div className="flex justify-between border-b pb-4 mb-4">
                 <div>
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Order ID</p>
-                  <p className="font-mono text-sm text-gray-700">{order.id || order._id}</p>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                    Order ID
+                  </p>
+                  <p className="font-mono text-sm text-gray-700">
+                    {order.id || order._id}
+                  </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Date</p>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                    Date
+                  </p>
                   <p className="text-sm text-gray-700">
-                    {order.orderDate ? new Date(order.orderDate).toLocaleString() : "-"}
+                    {order.orderDate
+                      ? new Date(order.orderDate).toLocaleString()
+                      : "-"}
                   </p>
                 </div>
               </div>
@@ -68,10 +81,13 @@ const OrderHistory = () => {
                   <div key={idx} className="flex justify-between">
                     <span className="text-gray-800">
                       {item.name}{" "}
-                      <span className="text-gray-400 text-sm">x{item.quantity}</span>
+                      <span className="text-gray-400 text-sm">
+                        x{item.quantity}
+                      </span>
                     </span>
                     <span className="text-gray-600">
-                      Rs. {(Number(item.price) * Number(item.quantity)).toFixed(2)}
+                      Rs.{" "}
+                      {(Number(item.price) * Number(item.quantity)).toFixed(2)}
                     </span>
                   </div>
                 ))}
